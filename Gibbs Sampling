@@ -1,0 +1,38 @@
+# Metropolis Hasting _ Gibbs sampling 
+	##### Gibbs Sampling Example
+	# summary statistics of sample
+	alpha1=alpha2=2
+	beta1=beta2=5
+	n    <- 30
+	x	<-	c(2,10,15,8,7)
+	xbar <- 15
+	s2   <- 3
+
+	# sample from the joint posterior (mu, tau, sigma2 | data)
+	mu     <- rep(NA, 11000)
+	tau    <- rep(NA, 11000)
+	sigma2   <- rep(NA, 11000)
+	T      <- 1000    # burnin
+	mu[1] <- 0  # initialisation
+	for(i in 2:11000) {   
+    tau[i]  <- 1/rgamma(n = 1, shape = alpha2+0.5, scale = beta2+mu[i-1]^2/2)    
+    sigma2[i] <- 1/rgamma(n = 1, shape = alpha1+n / 2, scale = beta1+0.5*sum((x-mu[i-1])^2))
+	mu[i] <- rnorm(n=1, mean=(n*tau[i]^2*xbar)/(sigma2[i]+n*tau[i]^2), sd=(sigma2[i]*tau[i]^2)/(sigma2[i]+n*tau[i]^2))
+	}
+	mu  <- mu[-(1:T)]   # remove burnin
+	tau <- tau[-(1:T)] # remove burnin
+	sigma2 <- sigma2[-(1:T)] # remove burnin
+	
+	i=1:2000
+	mu <- mu[(5*i)] #thining
+	tau <- tau[(5*i)] #thining
+	sigma2 <- sigma2[(5*i)] #thining
+	
+	plot(ts(mu))
+	plot(ts(tau))
+	plot(ts(sigma2))
+	
+	acf(mu)
+	acf(tau)
+	acf(sigma2)
+	
